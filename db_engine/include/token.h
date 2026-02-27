@@ -5,6 +5,7 @@ enum class TokenType{
     IDENTIFIER,
     NUMBER,
     STRING,
+    BOOLEAN,
 
     CREATE,
     TABLE,
@@ -27,6 +28,13 @@ enum class TokenType{
     RPAREN,
     EQUAL,
     SEMICOLON,
+
+    LESS,
+    GREATER,
+    LESS_EQUAL,
+    GREATER_EQUAL,
+    NOT_EQUAL,
+    EQUAL_EQUAL,
 
     END_OF_FILE,
     INVALID

@@ -15,7 +15,9 @@ static std::unordered_map<std::string, TokenType> Keywords = {
     {"INT", TokenType::INT_TYPE},
     {"STRING", TokenType::STRING_TYPE},
     {"BOOL", TokenType::BOOL_TYPE},
-    {"DOUBLE", TokenType::DOUBLE_TYPE}};
+    {"DOUBLE", TokenType::DOUBLE_TYPE},
+    {"TRUE",TokenType::BOOLEAN},
+    {"FALSE",TokenType::BOOLEAN}};
 
 Tokenizer::Tokenizer(const std::string &in)
 : input(in), pos(0) {};
@@ -45,7 +47,7 @@ Token Tokenizer::next(){
     skipWhiteSpaces();
     if(isAtEnd()) return {TokenType::END_OF_FILE,""};
 
-    char c=input[pos];
+    char c=currentChar();
 
     if(std::isalpha(c)){
         return identifier();
@@ -56,16 +58,40 @@ Token Tokenizer::next(){
     if(c=='"'){
         return stringLiteral();
     }
-    pos++;
+    
     switch(c){
-        case '*':return {TokenType::STAR,"*"};
-        case '(':return {TokenType::LPAREN,"("};
-        case ',':return {TokenType::COMMA,","};
-        case ')':return {TokenType::RPAREN,")"};
-        case '=':return {TokenType::EQUAL,"="};
-        case ';':return {TokenType::SEMICOLON,";"};
+        case '>':
+        if (peekChar() == '=') {
+            pos += 2;
+            return Token(TokenType::GREATER_EQUAL, ">=");
+        }
+        pos++;
+        return Token(TokenType::GREATER, ">");
 
-        default: return {TokenType::INVALID, std::string(1,c)};
+        case '<':
+            if (peekChar() == '=') {
+                pos += 2;
+                return Token(TokenType::LESS_EQUAL, "<=");
+            }
+            pos++;
+            return Token(TokenType::LESS, "<");
+
+        case '!':
+            if (peekChar() == '=') {
+                pos += 2;
+                return Token(TokenType::NOT_EQUAL, "!=");
+            }
+            pos++; 
+            return Token(TokenType::INVALID, "!");
+
+        case '*':pos ++;return {TokenType::STAR,"*"};
+        case '(':pos++;return {TokenType::LPAREN,"("};
+        case ',':pos++;return {TokenType::COMMA,","};
+        case ')':pos++;return {TokenType::RPAREN,")"};
+        case '=':pos++;return {TokenType::EQUAL,"="};
+        case ';':pos++;return {TokenType::SEMICOLON,";"};
+
+        default: pos++;return {TokenType::INVALID, std::string(1,c)};
     }
     
 }
@@ -78,7 +104,7 @@ Token Tokenizer::identifier(){
     }
     std::string text=input.substr(start,pos-start);
     std::string upper=text;
-    for(char c:upper) c=std::toupper(c);
+    for(char &c:upper) c=std::toupper(c);
 
     if(Keywords.count(upper)){
         return {Keywords[upper],text};
@@ -103,6 +129,12 @@ Token Tokenizer::stringLiteral(){
     while(!isAtEnd() && currentChar()!='"'){
         pos++;
     }
+    std::string literal=input.substr(start,pos-start);
     if(!isAtEnd())pos++;
-    return {TokenType::STRING,input.substr(start,pos-start)};
+    return {TokenType::STRING,literal};
+}
+
+char Tokenizer::peekChar() const{
+    if(pos+1>=input.size())return '\0';
+    return input[pos+1];
 }

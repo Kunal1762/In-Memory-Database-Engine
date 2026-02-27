@@ -4,7 +4,97 @@
 #include <string>
 #include "../include/tokenizer.h"
 
+#include <cassert>
+#include <cstdlib>
+#include <ctime>
+
 using namespace std;
+
+void runTokenizerTest(const std::string& input) {
+    std::cout << "\nInput: [" << input << "]\n";
+
+    Tokenizer tokenizer(input);
+
+    size_t safetyCounter = 0;
+
+    while (true) {
+        size_t before = tokenizer.getPosition();
+        Token t = tokenizer.next();
+
+        std::cout << static_cast<int>(t.type)
+                  << " -> " << t.text << "\n";
+
+        // 🔒 Hard safety invariant
+        assert(tokenizer.getPosition() > before
+               || t.type == TokenType::END_OF_FILE);
+
+        if (t.type == TokenType::END_OF_FILE)
+            break;
+
+        safetyCounter++;
+        assert(safetyCounter < 10000);
+    }
+}
+
+void runAllTokenizerTests() {
+
+    std::cout << "\n===== BASIC =====\n";
+    runTokenizerTest("");
+    runTokenizerTest("   ");
+    runTokenizerTest("\n\t");
+
+    std::cout << "\n===== SINGLE CHAR =====\n";
+    runTokenizerTest("!");
+    runTokenizerTest("=");
+    runTokenizerTest(">");
+    runTokenizerTest("<");
+    runTokenizerTest(",");
+    runTokenizerTest("(");
+    runTokenizerTest(")");
+    runTokenizerTest("*");
+    runTokenizerTest(";");
+    runTokenizerTest("@");
+
+    std::cout << "\n===== MULTI CHAR =====\n";
+    runTokenizerTest(">=");
+    runTokenizerTest("<=");
+    runTokenizerTest("!=");
+    runTokenizerTest(">x");
+    runTokenizerTest("!x");
+
+    std::cout << "\n===== IDENTIFIERS =====\n";
+    runTokenizerTest("abc");
+    runTokenizerTest("_abc");
+    runTokenizerTest("abc123");
+    runTokenizerTest("CREATE");
+    runTokenizerTest("create");
+    runTokenizerTest("CrEaTe");
+
+    std::cout << "\n===== NUMBERS =====\n";
+    runTokenizerTest("0");
+    runTokenizerTest("123");
+    runTokenizerTest("00123");
+    runTokenizerTest("123abc");
+
+    std::cout << "\n===== STRINGS =====\n";
+    runTokenizerTest("\"\"");
+    runTokenizerTest("\"hello\"");
+    runTokenizerTest("\"hello world\"");
+    runTokenizerTest("\"unterminated");
+
+    std::cout << "\n===== REAL SQL =====\n";
+    runTokenizerTest("CREATE TABLE Employee (id INT, name STRING);");
+    runTokenizerTest("INSERT INTO Employee VALUES (1, \"John\");");
+
+    std::cout << "\n===== RANDOM STRESS =====\n";
+    srand(time(nullptr));
+    std::string randomInput;
+
+    for(int i = 0; i < 1000; i++)
+        randomInput += char(rand() % 128);
+
+    runTokenizerTest(randomInput);
+}
 
 void printRow(row* r) {
     if (!r) {
@@ -158,18 +248,22 @@ int main() {
 
 
 
- std::string input =
-        "CREATE TABLE Employee (id INT, name STRING);";
+//  std::string input =
+//         "CREATE TABLE Employee (id INT, name STRING);";
 
-    Tokenizer tokenizer(input);
+//     Tokenizer tokenizer(input);
 
-    while (true) {
-        Token t = tokenizer.next();
-        std::cout << static_cast<int>(t.type)
-                  << " -> " << t.text << std::endl;
+//     while (true) {
+//         Token t = tokenizer.next();
+//         std::cout << static_cast<int>(t.type)
+//                   << " -> " << t.text << std::endl;
 
-        if (t.type == TokenType::END_OF_FILE) break;
-    }
+//         if (t.type == TokenType::END_OF_FILE) break;
+//     }
+
+//     return 0;
+
+     runAllTokenizerTests();
 
     return 0;
 
