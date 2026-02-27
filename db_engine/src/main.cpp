@@ -248,22 +248,22 @@ int main() {
 
 
 
-//  std::string input =
-//         "CREATE TABLE Employee (id INT, name STRING);";
+ std::string input =
+        "CREATE TABLE Employee (id INT, name STRING);";
 
-//     Tokenizer tokenizer(input);
+    Tokenizer tokenizer(input);
 
-//     while (true) {
-//         Token t = tokenizer.next();
-//         std::cout << static_cast<int>(t.type)
-//                   << " -> " << t.text << std::endl;
+    while (true) {
+        Token t = tokenizer.next();
+        std::cout << static_cast<int>(t.type)
+                  << " -> " << t.text << std::endl;
 
-//         if (t.type == TokenType::END_OF_FILE) break;
-//     }
+        if (t.type == TokenType::END_OF_FILE) break;
+    }
 
-//     return 0;
+    return 0;
 
-     runAllTokenizerTests();
+    //  runAllTokenizerTests();
 
     return 0;
 
