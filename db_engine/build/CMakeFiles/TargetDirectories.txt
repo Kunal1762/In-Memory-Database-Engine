@@ -1,3 +1,0 @@
-D:/DB/db_engine/build/CMakeFiles/db_engine.dir
-D:/DB/db_engine/build/CMakeFiles/edit_cache.dir
-D:/DB/db_engine/build/CMakeFiles/rebuild_cache.dir
